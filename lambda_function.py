@@ -20,7 +20,8 @@ from ratelimiter import RateLimiter
 # ユーザーごとのレートリミッターを保存するディクショナリ
 user_rate_limiters = {}
 
-conversation_history = []
+# ユーザーごとに会話履歴を分離（全ユーザー共有だと他ユーザーへの会話漏洩リスクあり）
+user_conversation_histories = {}
 
 from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
@@ -197,6 +198,7 @@ class ChatGPTIntentHandler(AbstractRequestHandler):
                 .response
             )
 
+        conversation_history = user_conversation_histories.setdefault(user_id, [])
         conversation_history.append(f"ユーザー: {question}")
 
         prompt = "\n"
